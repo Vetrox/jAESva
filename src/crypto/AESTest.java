@@ -1,6 +1,7 @@
 package crypto;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 class AESTest {
 
@@ -22,6 +23,12 @@ class AESTest {
             hexStringToByteArray("bfb44127"),
             hexStringToByteArray("5d521198"),
             hexStringToByteArray("30aef1e5")
+    };
+    public static final byte[][] afterMixColumns = new byte[][]{
+            hexStringToByteArray("04e04828"),
+            hexStringToByteArray("66cbf806"),
+            hexStringToByteArray("8119d326"),
+            hexStringToByteArray("e59a7a4c")
     };
 
     public static byte[] hexStringToByteArray(String s) {
@@ -45,5 +52,16 @@ class AESTest {
         byte[][] cache = afterSubBytes.clone();
         AESUtil.shiftRows(cache);
         Assertions.assertArrayEquals(cache, afterShiftRows);
+    }
+
+    @Test
+    void mixColumns() {
+        Assertions.assertArrayEquals(afterMixColumns, AESUtil.mixColumns(afterShiftRows));
+    }
+
+    @Test
+    void multGalois() {
+        Assertions.assertEquals(AESUtil.multGalois(hexStringToByteArray("20")[0], hexStringToByteArray("d4")[0]),
+                hexStringToByteArray("b3")[0]);
     }
 }
