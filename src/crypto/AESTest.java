@@ -61,7 +61,11 @@ class AESTest {
 
     @Test
     void multGalois() {
-        Assertions.assertEquals(AESUtil.multGalois(hexStringToByteArray("20")[0], hexStringToByteArray("d4")[0]),
-                hexStringToByteArray("b3")[0]);
+        Assertions.assertEquals(AESUtil.multGalois((byte) 0x02, (byte) 0xd4), (byte) 0xb3);
+    }
+
+    @Test
+    void unsignedByte() {
+        Assertions.assertEquals(Byte.toUnsignedInt((byte) 0xff), 0xff);
     }
 }

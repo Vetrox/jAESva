@@ -2,7 +2,7 @@ package crypto;
 
 public final class AESUtil {
 
-    public static final int irreduciblePolynomial = 0b100011011;
+    public static final int irreduciblePolynomial = 0b1_0001_1011;
     public static final byte[][] AESMATRIX = new byte[][]{
             {0x2, 0x3, 0x1, 0x1}, {0x1, 0x2, 0x3, 0x1}, {0x1, 0x1, 0x2, 0x3}, {0x3, 0x1, 0x1, 0x2}
     };
@@ -124,18 +124,16 @@ public final class AESUtil {
     }
 
     public static byte multGalois(byte a, byte b) {
-        int bShift;
-        int sol = 0;
+        byte sol = 0;
         for (int i = 0; i < 8; i++) {
             if ((a & (0b1 << i)) != 0) {
-                bShift = b << i;
-                sol ^= a ^ bShift;
+                sol ^= modGalois(Byte.toUnsignedInt(b) << i);
             }
         }
-        return modGalois(sol);
+        return sol;
     }
 
     public static byte modGalois(int sol) {
-        return (byte) (sol >= irreduciblePolynomial ? sol ^ irreduciblePolynomial : sol);
+        return (byte) ((sol & 0b1_0000_0000) != 0 ? (sol ^ irreduciblePolynomial) : sol);
     }
 }
