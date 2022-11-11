@@ -106,19 +106,18 @@ public final class AESUtil {
 
     public static byte[][] mixColumns(byte[][] plaintext) {
         byte[][] ciphertext = new byte[4][4];
-        for (int i = 0; i < 4; i++) {
-            byte[] column = new byte[]{plaintext[0][i], plaintext[1][i], plaintext[2][i], plaintext[3][i]};
-            for (int j = 0; j < 4; j++) {
-                ciphertext[j][i] = multColumnGalois(column, j);
+        for (int row = 0; row < 4; row++) {
+            for (int column = 0; column < 4; column++) {
+                ciphertext[row][column] = multColumnGalois(plaintext, column, row);
             }
         }
         return ciphertext;
     }
 
-    public static byte multColumnGalois(byte[] col, int rowIndex) {
+    public static byte multColumnGalois(byte[][] plaintext, int plaintextColumnIndex, int aesRowIndex) {
         byte sum = 0;
         for (int i = 0; i < 4; i++) {
-            sum ^= multGalois(col[i], AES_MATRIX[rowIndex][i]);
+            sum ^= multGalois(plaintext[i][plaintextColumnIndex], AES_MATRIX[aesRowIndex][i]);
         }
         return sum;
     }
