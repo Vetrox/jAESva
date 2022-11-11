@@ -50,37 +50,95 @@ public final class AESUtil {
      *
      * @return ciphertext from the encrypted plaintext
      */
-    public static void encrypt(byte[][] plaintext) {
-        addRoundKey(plaintext);
+    public static byte[][] encrypt(byte[][] plaintext, byte[][] key) {
+        byte[][] keySchedule = genKeySchedule(key);
+        addRoundKey(plaintext, keySchedule, 0);
 
         for (int i = 0; i < 9; i++) {
             subBytes(plaintext);
             shiftRows(plaintext);
-            mixColumns(plaintext);
-            addRoundKey(plaintext);
+            plaintext = mixColumns(plaintext);
+            addRoundKey(plaintext, keySchedule, i + 1);
         }
 
         subBytes(plaintext);
         shiftRows(plaintext);
-        addRoundKey(plaintext);
+        addRoundKey(plaintext, keySchedule, 10);
+        return plaintext; // TODO: remove this return when we figured out what causes the parameter-value Bug
     }
 
-    public static void addRoundKey(byte[][] plaintext) {
+    public static final byte[][] roundConstants = {
+            {0x01, 0x00, 0x00, 0x00},
+            {0x02, 0x00, 0x00, 0x00},
+            {0x04, 0x00, 0x00, 0x00},
+            {0x08, 0x00, 0x00, 0x00},
+            {0x10, 0x00, 0x00, 0x00},
+            {0x20, 0x00, 0x00, 0x00},
+            {0x40, 0x00, 0x00, 0x00},
+            {(byte) 0x80, 0x00, 0x00, 0x00},
+            {0x1b, 0x00, 0x00, 0x00},
+            {0x36, 0x00, 0x00, 0x00}
+    };
 
+    public static byte[][] genKeySchedule(byte[][] key) {
+        byte[][] keySchedule = new byte[4][44]; // fill first 4 columns with keybytes
+        for (int i = 0; i < 4; i++) {
+            System.arraycopy(key[i], 0, keySchedule[i], 0, 4);
+        }
+
+        for (int roundKeyIndex = 4; roundKeyIndex < 44; roundKeyIndex++) {
+            if (roundKeyIndex % 4 == 0) {
+                byte[] col = getColumn(keySchedule, roundKeyIndex - 1);
+                col = rotColumn(col);
+                for (int i = 0; i < 4; i++) {
+                    col[i] = subByte(col[i]);
+                }
+                for (int i = 0; i < 4; i++) {
+                    keySchedule[i][roundKeyIndex] =
+                            (byte) (getColumn(keySchedule, roundKeyIndex - 4)[i] ^ col[i] ^ roundConstants[roundKeyIndex / 4 - 1][i]);
+                }
+            } else {
+                for (int i = 0; i < 4; i++) {
+                    keySchedule[i][roundKeyIndex] =
+                            (byte) (keySchedule[i][roundKeyIndex - 1] ^ keySchedule[i][roundKeyIndex - 4]);
+                }
+            }
+        }
+        return keySchedule;
+    }
+
+    public static void addRoundKey(byte[][] plaintext, byte[][] keySchedule, int roundNumber) {
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                plaintext[i][j] ^= keySchedule[i][4 * roundNumber + j];
+            }
+        }
+    }
+
+    public static byte[] getColumn(byte[][] input, int columnIndex) {
+        return new byte[]{input[0][columnIndex], input[1][columnIndex], input[2][columnIndex], input[3][columnIndex]};
     }
 
     public static void subBytes(byte[][] plaintext) {
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
-                plaintext[i][j] = (byte) sBox[Byte.toUnsignedInt(plaintext[i][j])];
+                plaintext[i][j] = subByte(plaintext[i][j]);
             }
         }
+    }
+
+    public static byte subByte(byte input) {
+        return (byte) sBox[Byte.toUnsignedInt(input)];
     }
 
     public static void shiftRows(byte[][] plaintext) {
         for (int i = 1; i < 4; i++) {
             plaintext[i] = shiftRow(plaintext[i], i);
         }
+    }
+
+    public static byte[] rotColumn(byte[] column) {
+        return shiftRow(column, 1);
     }
 
     public static byte[] shiftRow(byte[] row, int amount) {
