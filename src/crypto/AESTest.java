@@ -68,5 +68,6 @@ class AESTest {
     @Test
     void unsignedByte() {
         Assertions.assertEquals(Byte.toUnsignedInt((byte) 0xff), 0xff);
+        Assertions.assertTrue((((byte) (0x80)) & 0b1000_0000) != 0);
     }
 }
