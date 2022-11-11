@@ -34,6 +34,13 @@ class AESTest {
     }
 
     @org.junit.jupiter.api.Test
+    void subBytes() {
+        byte[][] cache = beforeSubBytes.clone();
+        AESUtil.subBytes(cache);
+        Assertions.assertArrayEquals(cache, afterSubBytes);
+    }
+
+    @org.junit.jupiter.api.Test
     void shiftRows() {
         byte[][] cache = afterSubBytes.clone();
         AESUtil.shiftRows(cache);
