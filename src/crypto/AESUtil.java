@@ -2,8 +2,8 @@ package crypto;
 
 public final class AESUtil {
 
-    public static final int irreduciblePolynomial = 0b1_0001_1011;
-    public static final byte[][] AESMATRIX = new byte[][]{
+    public static final int IRREDUCIBLE_POLYNOMIAL = 0b1_0001_1011;
+    public static final byte[][] AES_MATRIX = new byte[][]{
             {0x2, 0x3, 0x1, 0x1}, {0x1, 0x2, 0x3, 0x1}, {0x1, 0x1, 0x2, 0x3}, {0x3, 0x1, 0x1, 0x2}
     };
     private static int[] sBox = {
@@ -118,7 +118,7 @@ public final class AESUtil {
     public static byte multColumnGalois(byte[] col, int rowIndex) {
         byte sum = 0;
         for (int i = 0; i < 4; i++) {
-            sum ^= multGalois(col[i], AESMATRIX[rowIndex][i]);
+            sum ^= multGalois(col[i], AES_MATRIX[rowIndex][i]);
         }
         return sum;
     }
@@ -134,6 +134,6 @@ public final class AESUtil {
     }
 
     public static byte modGalois(int sol) {
-        return (byte) ((sol & 0b1_0000_0000) != 0 ? (sol ^ irreduciblePolynomial) : sol);
+        return (byte) ((sol & 0b1_0000_0000) != 0 ? (sol ^ IRREDUCIBLE_POLYNOMIAL) : sol);
     }
 }
