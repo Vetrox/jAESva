@@ -6,6 +6,11 @@ public final class AESUtil {
     public static final byte[][] AES_MATRIX = new byte[][]{
             {0x2, 0x3, 0x1, 0x1}, {0x1, 0x2, 0x3, 0x1}, {0x1, 0x1, 0x2, 0x3}, {0x3, 0x1, 0x1, 0x2}
     };
+
+    public static final byte[][] INVERSE_AES_MATRIX = new byte[][]{
+            {0x0E, 0x0B, 0x0D, 0x09}, {0x09, 0x0E, 0x0B, 0x0D}, {0x0D, 0x09, 0x0E, 0x0B}, {0x0B, 0x0D, 0x09, 0x0E}
+    };
+
     private static final int[] sBox = {
             0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5, 0x30, 0x01, 0x67, 0x2b, 0xfe, 0xd7, 0xab, 0x76,
 
@@ -80,13 +85,29 @@ public final class AESUtil {
         for (int i = 0; i < 9; i++) {
             subBytes(plaintext);
             shiftRows(plaintext);
-            mixColumns(plaintext);
+            mixColumns(plaintext, AES_MATRIX);
             addRoundKey(plaintext, keySchedule, i + 1);
         }
 
         subBytes(plaintext);
         shiftRows(plaintext);
         addRoundKey(plaintext, keySchedule, 10);
+    }
+
+    public static void decrypt(byte[][] plaintext, byte[][] key) {
+        byte[][] keySchedule = genKeySchedule(key);
+        addRoundKey(plaintext, keySchedule, 10);
+        inverseShiftRows(plaintext);
+        inverseSubBytes(plaintext);
+
+        for (int i = 8; i >= 0; i--) {
+            addRoundKey(plaintext, keySchedule, i + 1);
+            mixColumns(plaintext, INVERSE_AES_MATRIX);
+            inverseShiftRows(plaintext);
+            inverseSubBytes(plaintext);
+        }
+
+        addRoundKey(plaintext, keySchedule, 0);
     }
 
     public static final byte[][] roundConstants = {
@@ -190,11 +211,11 @@ public final class AESUtil {
         return rowCopy;
     }
 
-    public static void mixColumns(byte[][] plaintext) {
+    public static void mixColumns(byte[][] plaintext, byte[][] MATRIX) {
         byte[][] ciphertext = new byte[4][4];
         for (int row = 0; row < 4; row++) {
             for (int column = 0; column < 4; column++) {
-                ciphertext[row][column] = multColumnGF(plaintext, column, row);
+                ciphertext[row][column] = multColumnGF(plaintext, column, row, MATRIX);
             }
         }
         for (int i = 0; i < 4; i++) {
@@ -202,10 +223,10 @@ public final class AESUtil {
         }
     }
 
-    public static byte multColumnGF(byte[][] plaintext, int plaintextColumnIndex, int aesRowIndex) {
+    public static byte multColumnGF(byte[][] plaintext, int plaintextColumnIndex, int aesRowIndex, byte[][] MATRIX) {
         byte sum = 0;
         for (int i = 0; i < 4; i++) {
-            sum ^= multGF256(plaintext[i][plaintextColumnIndex], AES_MATRIX[aesRowIndex][i]);
+            sum ^= multGF256(plaintext[i][plaintextColumnIndex], MATRIX[aesRowIndex][i]);
         }
         return sum;
     }

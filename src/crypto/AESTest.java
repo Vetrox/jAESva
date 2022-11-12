@@ -92,6 +92,17 @@ class AESTest {
     }
 
     @Test
+    void decrypt() {
+        byte[][] cache = copy(ciphertext);
+        AESUtil.decrypt(cache, key);
+        Assertions.assertArrayEquals(plaintext, cache);
+
+        AESUtil.encrypt(cache, key);
+        AESUtil.decrypt(cache, key);
+        Assertions.assertArrayEquals(plaintext, cache);
+    }
+
+    @Test
     void subBytes() {
         byte[][] cache = copy(beforeSubBytes);
         AESUtil.subBytes(cache);
@@ -137,8 +148,11 @@ class AESTest {
     @Test
     void mixColumns() {
         byte[][] cache = copy(afterShiftRows);
-        AESUtil.mixColumns(cache);
+        AESUtil.mixColumns(cache, AESUtil.AES_MATRIX);
         Assertions.assertArrayEquals(afterMixColumns, cache);
+
+        AESUtil.mixColumns(cache, AESUtil.INVERSE_AES_MATRIX);
+        Assertions.assertArrayEquals(afterShiftRows, cache);
     }
 
     @Test
