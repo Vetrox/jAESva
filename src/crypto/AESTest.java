@@ -86,14 +86,9 @@ class AESTest {
 
     @Test
     void encrypt() {
-        byte[][] modifiedParameterValue = copy(plaintext);
-        byte[][] returnedValue = AESUtil.encrypt(modifiedParameterValue, key);
-        // weirdest bug of my entire life:
-        Assertions.assertArrayEquals(afterShiftRows, modifiedParameterValue); // this is semantically wrong but true,
-        // somehow???
-        Assertions.assertArrayEquals(ciphertext, returnedValue); // returnedValue should be equal to
-        // modifiedParameterValue
-
+        byte[][] cache = copy(plaintext);
+        AESUtil.encrypt(cache, key);
+        Assertions.assertArrayEquals(ciphertext, cache);
     }
 
     @org.junit.jupiter.api.Test
@@ -117,7 +112,9 @@ class AESTest {
 
     @Test
     void mixColumns() {
-        Assertions.assertArrayEquals(afterMixColumns, AESUtil.mixColumns(afterShiftRows));
+        byte[][] cache = copy(afterShiftRows);
+        AESUtil.mixColumns(cache);
+        Assertions.assertArrayEquals(afterMixColumns, cache);
     }
 
     @Test

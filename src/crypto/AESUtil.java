@@ -50,21 +50,20 @@ public final class AESUtil {
      *
      * @return ciphertext from the encrypted plaintext
      */
-    public static byte[][] encrypt(byte[][] plaintext, byte[][] key) {
+    public static void encrypt(byte[][] plaintext, byte[][] key) {
         byte[][] keySchedule = genKeySchedule(key);
         addRoundKey(plaintext, keySchedule, 0);
 
         for (int i = 0; i < 9; i++) {
             subBytes(plaintext);
             shiftRows(plaintext);
-            plaintext = mixColumns(plaintext);
+            mixColumns(plaintext);
             addRoundKey(plaintext, keySchedule, i + 1);
         }
 
         subBytes(plaintext);
         shiftRows(plaintext);
         addRoundKey(plaintext, keySchedule, 10);
-        return plaintext; // TODO: remove this return when we figured out what causes the parameter-value Bug
     }
 
     public static final byte[][] roundConstants = {
@@ -149,14 +148,16 @@ public final class AESUtil {
         return rowCopy;
     }
 
-    public static byte[][] mixColumns(byte[][] plaintext) {
+    public static void mixColumns(byte[][] plaintext) {
         byte[][] ciphertext = new byte[4][4];
         for (int row = 0; row < 4; row++) {
             for (int column = 0; column < 4; column++) {
                 ciphertext[row][column] = multColumnGalois(plaintext, column, row);
             }
         }
-        return ciphertext;
+        for (int i = 0; i < 4; i++) {
+            System.arraycopy(ciphertext[i], 0, plaintext[i], 0, 4);
+        }
     }
 
     public static byte multColumnGalois(byte[][] plaintext, int plaintextColumnIndex, int aesRowIndex) {
