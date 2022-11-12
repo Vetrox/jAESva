@@ -6,7 +6,7 @@ public final class AESUtil {
     public static final byte[][] AES_MATRIX = new byte[][]{
             {0x2, 0x3, 0x1, 0x1}, {0x1, 0x2, 0x3, 0x1}, {0x1, 0x1, 0x2, 0x3}, {0x3, 0x1, 0x1, 0x2}
     };
-    private static int[] sBox = {
+    private static final int[] sBox = {
             0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5, 0x30, 0x01, 0x67, 0x2b, 0xfe, 0xd7, 0xab, 0x76,
 
             0xca, 0x82, 0xc9, 0x7d, 0xfa, 0x59, 0x47, 0xf0, 0xad, 0xd4, 0xa2, 0xaf, 0x9c, 0xa4, 0x72, 0xc0,
@@ -47,8 +47,6 @@ public final class AESUtil {
      * Encrypts a plaintext via AES to the ciphertext.
      *
      * @param plaintext Plaintext that will be encrypted
-     *
-     * @return ciphertext from the encrypted plaintext
      */
     public static void encrypt(byte[][] plaintext, byte[][] key) {
         byte[][] keySchedule = genKeySchedule(key);
@@ -152,7 +150,7 @@ public final class AESUtil {
         byte[][] ciphertext = new byte[4][4];
         for (int row = 0; row < 4; row++) {
             for (int column = 0; column < 4; column++) {
-                ciphertext[row][column] = multColumnGalois(plaintext, column, row);
+                ciphertext[row][column] = multColumnGF(plaintext, column, row);
             }
         }
         for (int i = 0; i < 4; i++) {
@@ -160,25 +158,30 @@ public final class AESUtil {
         }
     }
 
-    public static byte multColumnGalois(byte[][] plaintext, int plaintextColumnIndex, int aesRowIndex) {
+    public static byte multColumnGF(byte[][] plaintext, int plaintextColumnIndex, int aesRowIndex) {
         byte sum = 0;
         for (int i = 0; i < 4; i++) {
-            sum ^= multGalois(plaintext[i][plaintextColumnIndex], AES_MATRIX[aesRowIndex][i]);
+            sum ^= multGF256(plaintext[i][plaintextColumnIndex], AES_MATRIX[aesRowIndex][i]);
         }
         return sum;
     }
 
-    public static byte multGalois(byte a, byte b) {
-        byte sol = 0;
+    public static byte multGF256(byte a, byte b) {
+        int sol = 0;
         for (int i = 0; i < 8; i++) {
             if ((a & (0b1 << i)) != 0) {
-                sol ^= modGalois(Byte.toUnsignedInt(b) << i);
+                sol ^= Byte.toUnsignedInt(b) << i;
             }
         }
-        return sol;
+        return modGF256AES(sol);
     }
 
-    public static byte modGalois(int sol) {
-        return (byte) (sol > 0xff ? (sol ^ IRREDUCIBLE_POLYNOMIAL) : sol);
+    public static byte modGF256AES(int sol) {
+        for (int i = 4 * 8 - 1; i >= 0; i--) {
+            if ((sol & (0x100 << i)) != 0) {
+                sol ^= IRREDUCIBLE_POLYNOMIAL << i;
+            }
+        }
+        return (byte) sol;
     }
 }

@@ -119,7 +119,7 @@ class AESTest {
 
     @Test
     void multGalois() {
-        Assertions.assertEquals(AESUtil.multGalois((byte) 0x02, (byte) 0xd4), (byte) 0xb3);
+        Assertions.assertEquals(AESUtil.multGF256((byte) 0x02, (byte) 0xd4), (byte) 0xb3);
     }
 
     @Test
