@@ -179,6 +179,6 @@ public final class AESUtil {
     }
 
     public static byte modGalois(int sol) {
-        return (byte) ((sol & 0b1_0000_0000) != 0 ? (sol ^ IRREDUCIBLE_POLYNOMIAL) : sol);
+        return (byte) (sol > 0xff ? (sol ^ IRREDUCIBLE_POLYNOMIAL) : sol);
     }
 }
