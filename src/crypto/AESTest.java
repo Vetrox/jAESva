@@ -91,11 +91,23 @@ class AESTest {
         Assertions.assertArrayEquals(ciphertext, cache);
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     void subBytes() {
         byte[][] cache = copy(beforeSubBytes);
         AESUtil.subBytes(cache);
         Assertions.assertArrayEquals(afterSubBytes, cache);
+    }
+
+    @Test
+    void inverseSubBytes() {
+        byte[][] cache = copy(afterSubBytes);
+        AESUtil.inverseSubBytes(cache);
+        Assertions.assertArrayEquals(beforeSubBytes, cache);
+
+        cache = copy(beforeSubBytes);
+        AESUtil.subBytes(cache);
+        AESUtil.inverseSubBytes(cache);
+        Assertions.assertArrayEquals(beforeSubBytes, cache);
     }
 
     @org.junit.jupiter.api.Test
