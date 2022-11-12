@@ -171,14 +171,21 @@ public final class AESUtil {
         }
     }
 
+    public static void inverseShiftRows(byte[][] plaintext) {
+        for (int i = 1; i < 4; i++) {
+            plaintext[i] = shiftRow(plaintext[i], -i);
+        }
+    }
+
     public static byte[] rotColumn(byte[] column) {
         return shiftRow(column, 1);
     }
 
     public static byte[] shiftRow(byte[] row, int amount) {
+        amount = amount % 4;
         byte[] rowCopy = row.clone();
         for (int i = 0; i < 4; i++) {
-            rowCopy[i] = row[(i + amount) % 4];
+            rowCopy[i] = row[(4 + i + amount) % 4];
         }
         return rowCopy;
     }
