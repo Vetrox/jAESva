@@ -37,10 +37,15 @@ class ModesTest {
     }
 
     @Test
-    void encryptECB() {
+    void encryptDecryptECB() {
+        System.out.println("Plaintext: " + message);
         ArrayList<Boolean> m = strToBoolArr(message);
         ArrayList<Boolean> encrypted = ECBMode.encrypt(m, AESTest.key);
-        System.out.println(Modes.boolArrToStr(encrypted)); // TODO: We have no decrypt atm. Implement and test here.
+        System.out.println("Ciphertext: " + Modes.boolArrToStr(encrypted));
+
+        ArrayList<Boolean> decrypted = ECBMode.decrypt(encrypted, AESTest.key);
+        Assertions.assertEquals(strToBoolArr(message), decrypted);
+        System.out.println("Decrypted Ciphertext: " + boolArrToStr(decrypted));
     }
 
     @Test

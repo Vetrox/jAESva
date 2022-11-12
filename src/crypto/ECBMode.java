@@ -44,4 +44,14 @@ public final class ECBMode extends Modes {
         }
         return merge(blocks);
     }
+
+    public static ArrayList<Boolean> decrypt(ArrayList<Boolean> ciphertext, byte[][] key) {
+        ArrayList<byte[][]> blocks = split(ciphertext);
+        for (byte[][] block : blocks) {
+            AESUtil.decrypt(block, key);
+        }
+        ArrayList<Boolean> ret = merge(blocks);
+        unPadMessage(ret);
+        return ret;
+    }
 }
