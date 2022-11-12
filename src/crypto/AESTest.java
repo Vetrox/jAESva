@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 
 class AESTest {
 
-    private static final byte[][] key = new byte[][]{
+    public static final byte[][] key = new byte[][]{
             hexStringToByteArray("2b28ab09"),
             hexStringToByteArray("7eaef7cf"),
             hexStringToByteArray("15d2154f"),
