@@ -2,26 +2,24 @@ package crypto;
 
 import java.util.ArrayList;
 
-public class Modes {
-    public static final int blockSizeBits = 128;
+public interface Modes {
+    int blockSizeBits = 128;
 
-    protected Modes() {}
-
-    public static void padMessage(ArrayList<Boolean> message) {
+    static void padMessage(ArrayList<Boolean> message) {
         message.add(true);
         while (message.size() % blockSizeBits != 0) {
             message.add(false);
         }
     }
 
-    public static void unPadMessage(ArrayList<Boolean> message) {
+    static void unPadMessage(ArrayList<Boolean> message) {
         while (!message.get(message.size() - 1)) {
             message.remove(message.size() - 1);
         }
         message.remove(message.size() - 1);
     }
 
-    protected static byte getByte(ArrayList<Boolean> message, int start) {
+    static byte getByte(ArrayList<Boolean> message, int start) {
         byte ret = 0;
         for (int i = 0; i < 8; i++) {
             ret |= (message.get(start + i) ? 1 : 0) << (7 - i);
@@ -29,7 +27,7 @@ public class Modes {
         return ret;
     }
 
-    public static ArrayList<Boolean> strToBoolArr(String message) {
+    static ArrayList<Boolean> strToBoolArr(String message) {
         ArrayList<Boolean> m = new ArrayList<>();
         byte[] bytes = message.getBytes();
         for (byte aByte : bytes) {
@@ -40,7 +38,7 @@ public class Modes {
         return m;
     }
 
-    public static String boolArrToStr(ArrayList<Boolean> message) {
+    static String boolArrToStr(ArrayList<Boolean> message) {
         byte[] ret = new byte[message.size() / 8];
         for (int i = 0; i < message.size() / 8; i++) {
             for (int j = 0; j < 8; j++) {
@@ -51,5 +49,4 @@ public class Modes {
         }
         return new String(ret);
     }
-
 }

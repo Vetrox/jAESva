@@ -2,7 +2,9 @@ package crypto;
 
 import java.util.ArrayList;
 
-public final class ECBMode extends Modes {
+public class ECBMode implements Modes {
+
+    protected ECBMode() {}
 
     public static ArrayList<byte[][]> split(ArrayList<Boolean> message) {
         if (message.size() % Modes.blockSizeBits != 0) {
@@ -14,7 +16,7 @@ public final class ECBMode extends Modes {
             byte[][] block = new byte[4][4];
             for (int i = 0; i < 4; i++) {
                 for (int j = 0; j < 4; j++) {
-                    block[i][j] = getByte(message, p * Modes.blockSizeBits + i * 4 * 8 + j * 8);
+                    block[i][j] = Modes.getByte(message, p * Modes.blockSizeBits + i * 4 * 8 + j * 8);
                 }
             }
             blocks.add(block);
@@ -37,7 +39,7 @@ public final class ECBMode extends Modes {
     }
 
     public static ArrayList<Boolean> encrypt(ArrayList<Boolean> message, byte[][] key) {
-        padMessage(message);
+        Modes.padMessage(message);
         ArrayList<byte[][]> blocks = split(message);
         for (byte[][] block : blocks) {
             AESUtil.encrypt(block, key);
@@ -51,7 +53,7 @@ public final class ECBMode extends Modes {
             AESUtil.decrypt(block, key);
         }
         ArrayList<Boolean> ret = merge(blocks);
-        unPadMessage(ret);
+        Modes.unPadMessage(ret);
         return ret;
     }
 }
