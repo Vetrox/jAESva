@@ -38,9 +38,16 @@ public class ECBMode implements Modes {
         return message;
     }
 
+    /**
+     * @param message [modified during execution but returned to original state]
+     * @param key     [const]
+     *
+     * @return ciphertext
+     */
     public static ArrayList<Boolean> encrypt(ArrayList<Boolean> message, byte[][] key) {
         Modes.padMessage(message);
         ArrayList<byte[][]> blocks = split(message);
+        Modes.unPadMessage(message);
         for (byte[][] block : blocks) {
             AESUtil.encrypt(block, key);
         }
