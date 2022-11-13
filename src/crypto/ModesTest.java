@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import static crypto.Modes.boolArrToStr;
 import static crypto.Modes.strToBoolArr;
@@ -46,6 +47,21 @@ class ModesTest {
         ArrayList<Boolean> decrypted = ECBMode.decrypt(encrypted, AESTest.key);
         Assertions.assertEquals(strToBoolArr(message), decrypted);
         System.out.println("Decrypted Ciphertext: " + boolArrToStr(decrypted));
+    }
+
+    @Test
+    void encryptDecryptCBC() {
+        System.out.println("Plaintext: " + message);
+        ArrayList<Boolean> m = strToBoolArr(message);
+        byte[][] initialValue = CBCMode.generateInitialValue();
+        System.out.println("InitialValue: " + Arrays.deepToString(initialValue));
+
+        ArrayList<Boolean> encrypted = CBCMode.encrypt(m, AESTest.key, initialValue);
+        System.out.println("Ciphertext: " + Modes.boolArrToStr(encrypted));
+
+        ArrayList<Boolean> decrypted = CBCMode.decrypt(encrypted, AESTest.key, initialValue);
+        System.out.println("Decrypted Ciphertext: " + boolArrToStr(decrypted));
+        Assertions.assertEquals(strToBoolArr(message), decrypted);
     }
 
     @Test
