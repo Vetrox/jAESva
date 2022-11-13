@@ -11,7 +11,7 @@ import static crypto.Modes.strToBoolArr;
 
 class ModesTest {
 
-    private static final String message = "Never gonna give you up!";
+    public static final String message = "Never gonna give you up!";
 
     @Test
     void padMessage() {
